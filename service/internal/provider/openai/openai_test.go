@@ -45,8 +45,13 @@ func TestChatCompletionSuccess(t *testing.T) {
 	if got["max_completion_tokens"].(float64) != 100 || len(got["messages"].([]any)) != 2 {
 		t.Fatalf("unexpected wire request %v", got)
 	}
-	if _, ok := got["stream"]; ok {
-		t.Fatal("stream must be omitted for non-streaming")
+	// Sent explicitly: some OpenAI-compatible routers stream by default when
+	// the field is absent.
+	if v, ok := got["stream"]; !ok || v != false {
+		t.Fatalf("stream must be sent as false for non-streaming, got %v (present=%v)", v, ok)
+	}
+	if _, ok := got["stream_options"]; ok {
+		t.Fatal("stream_options must be omitted for non-streaming")
 	}
 }
 
@@ -167,5 +172,43 @@ func TestStreamInterrupted(t *testing.T) {
 	}
 	if s.Usage().Status != provider.UsageUnknown {
 		t.Fatal("usage must be unknown for an interrupted stream")
+	}
+}
+
+// Some OpenAI-compatible routers (e.g. 9router) end the stream after the
+// finish_reason chunk without sending "data: [DONE]". A clean EOF after a
+// finish_reason is a complete response, not an interruption.
+func TestStreamEOFAfterFinishWithoutDone(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/event-stream")
+		fmt.Fprint(w, "data: {\"id\":\"c\",\"choices\":[{\"delta\":{\"content\":\"1, 2\"},\"finish_reason\":null}]}\n\n")
+		fmt.Fprint(w, "data: {\"id\":\"c\",\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":4,\"completion_tokens\":3,\"total_tokens\":7}}\n\n")
+	}))
+	defer srv.Close()
+	s, err := New().StreamChatCompletion(context.Background(), provider.Config{BaseURL: srv.URL}, req())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	var text strings.Builder
+	var finish string
+	for {
+		c, err := s.Recv()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		text.WriteString(c.Delta)
+		if c.FinishReason != "" {
+			finish = c.FinishReason
+		}
+	}
+	if text.String() != "1, 2" || finish != "stop" {
+		t.Fatalf("got %q %q", text.String(), finish)
+	}
+	if u := s.Usage(); u.Status != provider.UsageReported || u.InputTokens != 4 || u.OutputTokens != 3 {
+		t.Fatalf("usage %+v", u)
 	}
 }

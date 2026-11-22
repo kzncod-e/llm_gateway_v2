@@ -37,7 +37,7 @@ type wireRequest struct {
 	MaxCompletionTokens int            `json:"max_completion_tokens,omitempty"`
 	Stop                []string       `json:"stop,omitempty"`
 	User                string         `json:"user,omitempty"`
-	Stream              bool           `json:"stream,omitempty"`
+	Stream              bool           `json:"stream"` // always sent: some compatible routers stream by default
 	StreamOptions       *streamOptions `json:"stream_options,omitempty"`
 }
 
@@ -191,6 +191,9 @@ type stream struct {
 	sse   *provider.SSEReader
 	usage provider.Usage
 	done  bool
+	// finished is set once a finish_reason arrives; a clean EOF after it is a
+	// complete response even without "data: [DONE]".
+	finished bool
 }
 
 func (s *stream) Recv() (*provider.StreamChunk, error) {
@@ -201,6 +204,11 @@ func (s *stream) Recv() (*provider.StreamChunk, error) {
 		ev, err := s.sse.Next()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
+				if s.finished {
+					// Some compatible routers omit [DONE] after the final chunk.
+					s.done = true
+					return nil, io.EOF
+				}
 				err = io.ErrUnexpectedEOF // OpenAI always terminates with [DONE]
 			}
 			return nil, provider.StreamReadError(s.ctx, err)
@@ -232,6 +240,9 @@ func (s *stream) Recv() (*provider.StreamChunk, error) {
 		}
 		if fr := c.Choices[0].FinishReason; fr != nil {
 			ch.FinishReason = *fr
+			if *fr != "" {
+				s.finished = true
+			}
 		}
 		if ch.Delta == "" && ch.FinishReason == "" {
 			continue // role-only delta

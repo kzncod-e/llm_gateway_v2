@@ -224,11 +224,24 @@ type ModelInput struct {
 	Enabled     *bool      `json:"enabled"`
 }
 
+// validModelName accepts upstream model names, which may be namespaced with
+// slashes (e.g. "cx/gpt-6-sol" behind an OpenAI-compatible router). Explicit
+// routing splits "slug/model" on the first slash, so "router/cx/gpt-6-sol"
+// still resolves to model "cx/gpt-6-sol" on provider "router".
 func validModelName(s string) bool {
-	if s == "" || len(s) > 200 || strings.ContainsAny(s, " /\t\n?#") {
+	if s == "" || len(s) > 200 || strings.ContainsAny(s, " \t\n?#") {
+		return false
+	}
+	if strings.HasPrefix(s, "/") || strings.HasSuffix(s, "/") || strings.Contains(s, "//") {
 		return false
 	}
 	return true
+}
+
+// validAlias is stricter than validModelName: an alias with a slash would be
+// ambiguous with explicit "slug/model" routing.
+func validAlias(s string) bool {
+	return validModelName(s) && !strings.Contains(s, "/")
 }
 
 func (s *ProviderService) Models(ctx context.Context, providerID *uuid.UUID) ([]*model.Model, error) {
@@ -240,7 +253,7 @@ func (s *ProviderService) CreateModel(ctx context.Context, p *Principal, in Mode
 		return nil, err
 	}
 	if in.ProviderID == nil || in.Name == nil || !validModelName(strings.TrimSpace(*in.Name)) {
-		return nil, Invalid("provider_id and a model name (no spaces or slashes) are required")
+		return nil, Invalid("provider_id and a model name (no spaces; slashes only between segments) are required")
 	}
 	m := &model.Model{ID: model.NewID(), ProviderID: *in.ProviderID, Name: strings.TrimSpace(*in.Name), Enabled: true}
 	if in.DisplayName != nil {
@@ -357,7 +370,7 @@ func (s *ProviderService) SavePolicy(ctx context.Context, p *Principal, id *uuid
 		return nil, err
 	}
 	in.Alias = strings.TrimSpace(in.Alias)
-	if !validModelName(in.Alias) {
+	if !validAlias(in.Alias) {
 		return nil, Invalid("alias is required and may not contain spaces or slashes")
 	}
 	if len(in.TargetModelIDs) == 0 || len(in.TargetModelIDs) > 10 {

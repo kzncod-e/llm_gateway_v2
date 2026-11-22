@@ -1,0 +1,12 @@
+.env
+.env.local
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+*.test
+coverage.out
+.DS_Store
+service/bin/

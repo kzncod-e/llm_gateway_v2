@@ -28,34 +28,34 @@ type Cursor struct {
 }
 
 type RequestRow struct {
-	ID              uuid.UUID  `json:"id"`
-	TeamID          uuid.UUID  `json:"team_id"`
-	TeamName        string     `json:"team_name"`
-	APIKeyID        *uuid.UUID `json:"api_key_id"`
-	APIKeyPrefix    *string    `json:"api_key_prefix"`
-	UserID          *uuid.UUID `json:"user_id"`
-	Source          string     `json:"source"`
-	RequestedModel  string     `json:"requested_model"`
-	Stream          bool       `json:"stream"`
-	Status          string     `json:"status"`
-	HTTPStatus      int        `json:"http_status"`
-	ErrorCode       string     `json:"error_code"`
-	ErrorMessage    string     `json:"error_message"`
-	ProviderSlug    *string    `json:"provider_slug"`
-	ModelName       *string    `json:"model_name"`
-	AttemptCount    int        `json:"attempt_count"`
-	FallbackCount   int        `json:"fallback_count"`
-	InputTokens     *int64     `json:"input_tokens"`
-	OutputTokens    *int64     `json:"output_tokens"`
-	TotalTokens     *int64     `json:"total_tokens"`
-	UsageStatus     string     `json:"usage_status"`
-	CostNanos       *int64     `json:"cost_nanos"`
-	CostStatus      string     `json:"cost_status"`
-	BudgetCharge    int64      `json:"budget_charge_nanos"`
-	LatencyMs       int        `json:"latency_ms"`
-	TTFBMs          *int       `json:"ttfb_ms"`
-	CreatedAt       time.Time  `json:"created_at"`
-	CompletedAt     time.Time  `json:"completed_at"`
+	ID             uuid.UUID  `json:"id"`
+	TeamID         uuid.UUID  `json:"team_id"`
+	TeamName       string     `json:"team_name"`
+	APIKeyID       *uuid.UUID `json:"api_key_id"`
+	APIKeyPrefix   *string    `json:"api_key_prefix"`
+	UserID         *uuid.UUID `json:"user_id"`
+	Source         string     `json:"source"`
+	RequestedModel string     `json:"requested_model"`
+	Stream         bool       `json:"stream"`
+	Status         string     `json:"status"`
+	HTTPStatus     int        `json:"http_status"`
+	ErrorCode      string     `json:"error_code"`
+	ErrorMessage   string     `json:"error_message"`
+	ProviderSlug   *string    `json:"provider_slug"`
+	ModelName      *string    `json:"model_name"`
+	AttemptCount   int        `json:"attempt_count"`
+	FallbackCount  int        `json:"fallback_count"`
+	InputTokens    *int64     `json:"input_tokens"`
+	OutputTokens   *int64     `json:"output_tokens"`
+	TotalTokens    *int64     `json:"total_tokens"`
+	UsageStatus    string     `json:"usage_status"`
+	CostNanos      *int64     `json:"cost_nanos"`
+	CostStatus     string     `json:"cost_status"`
+	BudgetCharge   int64      `json:"budget_charge_nanos"`
+	LatencyMs      int        `json:"latency_ms"`
+	TTFBMs         *int       `json:"ttfb_ms"`
+	CreatedAt      time.Time  `json:"created_at"`
+	CompletedAt    time.Time  `json:"completed_at"`
 }
 
 const requestSelect = `SELECT r.id, r.team_id, t.name, r.api_key_id, k.prefix, r.user_id, r.source, r.requested_model, r.stream, r.status, r.http_status,
@@ -166,26 +166,26 @@ func escapeLike(s string) string {
 }
 
 type AttemptRow struct {
-	ID                uuid.UUID `json:"id"`
-	AttemptNumber     int       `json:"attempt_number"`
-	ProviderSlug      string    `json:"provider_slug"`
-	ModelName         string    `json:"model_name"`
-	Status            string    `json:"status"`
-	HTTPStatus        *int      `json:"http_status"`
-	ErrorKind         string    `json:"error_kind"`
-	ErrorMessage      string    `json:"error_message"`
-	Retryable         bool      `json:"retryable"`
-	StartedAt         time.Time `json:"started_at"`
-	DurationMs        int       `json:"duration_ms"`
-	TTFBMs            *int      `json:"ttfb_ms"`
-	UsageStatus       *string   `json:"usage_status"`
-	InputTokens       *int64    `json:"input_tokens"`
-	CachedInputTokens *int64    `json:"cached_input_tokens"`
-	CacheWriteTokens  *int64    `json:"cache_write_tokens"`
-	OutputTokens      *int64    `json:"output_tokens"`
-	ReasoningTokens   *int64    `json:"reasoning_tokens"`
-	TotalTokens       *int64    `json:"total_tokens"`
-	CostNanos         *int64    `json:"cost_nanos"`
+	ID                uuid.UUID  `json:"id"`
+	AttemptNumber     int        `json:"attempt_number"`
+	ProviderSlug      string     `json:"provider_slug"`
+	ModelName         string     `json:"model_name"`
+	Status            string     `json:"status"`
+	HTTPStatus        *int       `json:"http_status"`
+	ErrorKind         string     `json:"error_kind"`
+	ErrorMessage      string     `json:"error_message"`
+	Retryable         bool       `json:"retryable"`
+	StartedAt         time.Time  `json:"started_at"`
+	DurationMs        int        `json:"duration_ms"`
+	TTFBMs            *int       `json:"ttfb_ms"`
+	UsageStatus       *string    `json:"usage_status"`
+	InputTokens       *int64     `json:"input_tokens"`
+	CachedInputTokens *int64     `json:"cached_input_tokens"`
+	CacheWriteTokens  *int64     `json:"cache_write_tokens"`
+	OutputTokens      *int64     `json:"output_tokens"`
+	ReasoningTokens   *int64     `json:"reasoning_tokens"`
+	TotalTokens       *int64     `json:"total_tokens"`
+	CostNanos         *int64     `json:"cost_nanos"`
 	PricingID         *uuid.UUID `json:"pricing_id"`
 }
 

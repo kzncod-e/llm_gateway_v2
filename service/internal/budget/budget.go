@@ -208,19 +208,19 @@ func (s *Service) SweepExpired(ctx context.Context) (int, error) {
 
 // Status summarizes a team's budget for the console.
 type Status struct {
-	TeamID          uuid.UUID `json:"team_id"`
-	MonthlyLimit    *int64    `json:"monthly_limit_nanos"`
-	DailyLimit      *int64    `json:"daily_limit_nanos"`
-	WarnPct         int       `json:"warn_threshold_pct"`
-	MonthSpent      int64     `json:"month_spent_nanos"`
-	MonthReserved   int64     `json:"month_reserved_nanos"`
-	DaySpent        int64     `json:"day_spent_nanos"`
-	DayReserved     int64     `json:"day_reserved_nanos"`
-	MonthRemaining  *int64    `json:"month_remaining_nanos"`
-	DayRemaining    *int64    `json:"day_remaining_nanos"`
-	Warning         bool      `json:"warning"`
-	Exhausted       bool      `json:"exhausted"`
-	PeriodMonth     string    `json:"period_month"`
+	TeamID         uuid.UUID `json:"team_id"`
+	MonthlyLimit   *int64    `json:"monthly_limit_nanos"`
+	DailyLimit     *int64    `json:"daily_limit_nanos"`
+	WarnPct        int       `json:"warn_threshold_pct"`
+	MonthSpent     int64     `json:"month_spent_nanos"`
+	MonthReserved  int64     `json:"month_reserved_nanos"`
+	DaySpent       int64     `json:"day_spent_nanos"`
+	DayReserved    int64     `json:"day_reserved_nanos"`
+	MonthRemaining *int64    `json:"month_remaining_nanos"`
+	DayRemaining   *int64    `json:"day_remaining_nanos"`
+	Warning        bool      `json:"warning"`
+	Exhausted      bool      `json:"exhausted"`
+	PeriodMonth    string    `json:"period_month"`
 }
 
 func (s *Service) Status(ctx context.Context, teamID uuid.UUID) (*Status, error) {

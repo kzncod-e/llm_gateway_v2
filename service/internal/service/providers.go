@@ -148,7 +148,9 @@ func (s *ProviderService) Create(ctx context.Context, p *Principal, in ProviderI
 	return pr, nil
 }
 
-func (s *ProviderService) List(ctx context.Context) ([]*model.Provider, error) { return s.repo.ListProviders(ctx) }
+func (s *ProviderService) List(ctx context.Context) ([]*model.Provider, error) {
+	return s.repo.ListProviders(ctx)
+}
 
 func (s *ProviderService) Get(ctx context.Context, id uuid.UUID) (*model.Provider, error) {
 	pr, err := s.repo.Provider(ctx, id)

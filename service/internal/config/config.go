@@ -27,13 +27,13 @@ type Config struct {
 	MockBaseURL   string
 	DemoAPIKey    string
 
-	CookieSecure  bool
-	SessionTTL    time.Duration
-	AutoMigrate   bool
+	CookieSecure   bool
+	SessionTTL     time.Duration
+	AutoMigrate    bool
 	TrustedProxies []string
 
-	RateLimitFailOpen     bool
-	DefaultTeamRPM        int
+	RateLimitFailOpen      bool
+	DefaultTeamRPM         int
 	DefaultTeamConcurrency int
 
 	DefaultMaxOutputTokens int

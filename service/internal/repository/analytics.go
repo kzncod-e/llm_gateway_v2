@@ -88,7 +88,6 @@ func (r *Repo) Timeseries(ctx context.Context, f AnalyticsFilter, interval strin
 		return nil, fmt.Errorf("invalid interval %q", interval)
 	}
 	w := f.where("r")
-	n := len(w.args)
 	q := fmt.Sprintf(`WITH buckets AS (
 		SELECT generate_series(date_trunc('%[1]s', $1::timestamptz), date_trunc('%[1]s', $2::timestamptz - interval '1 microsecond'), interval '1 %[1]s') AS bucket
 	), agg AS (
@@ -100,7 +99,6 @@ func (r *Repo) Timeseries(ctx context.Context, f AnalyticsFilter, interval strin
 	)
 	SELECT b.bucket, COALESCE(a.requests, 0), COALESCE(a.failed, 0), COALESCE(a.cost, 0), COALESCE(a.input_tokens, 0), COALESCE(a.output_tokens, 0), COALESCE(a.latency, 0)
 	FROM buckets b LEFT JOIN agg a ON a.bucket = b.bucket ORDER BY b.bucket LIMIT 2000`, interval, w.sql())
-	_ = n
 	rows, err := r.db.Query(ctx, q, w.args...)
 	if err != nil {
 		return nil, err
@@ -177,16 +175,16 @@ func (r *Repo) Breakdown(ctx context.Context, f AnalyticsFilter, by string) ([]B
 // Reliability -------------------------------------------------------------------------
 
 type ProviderStats struct {
-	ProviderID   uuid.UUID  `json:"provider_id"`
-	Attempts     int64      `json:"attempts"`
-	Errors       int64      `json:"errors"`
-	Skipped      int64      `json:"skipped"`
-	ErrorRate    float64    `json:"error_rate"`
-	P50Ms        float64    `json:"p50_ms"`
-	P95Ms        float64    `json:"p95_ms"`
-	AvgTTFBMs    float64    `json:"avg_ttfb_ms"`
-	LastErrorAt  *time.Time `json:"last_error_at"`
-	LastError    *string    `json:"last_error"`
+	ProviderID  uuid.UUID  `json:"provider_id"`
+	Attempts    int64      `json:"attempts"`
+	Errors      int64      `json:"errors"`
+	Skipped     int64      `json:"skipped"`
+	ErrorRate   float64    `json:"error_rate"`
+	P50Ms       float64    `json:"p50_ms"`
+	P95Ms       float64    `json:"p95_ms"`
+	AvgTTFBMs   float64    `json:"avg_ttfb_ms"`
+	LastErrorAt *time.Time `json:"last_error_at"`
+	LastError   *string    `json:"last_error"`
 }
 
 func (r *Repo) ProviderStats(ctx context.Context, since time.Time) (map[uuid.UUID]*ProviderStats, error) {

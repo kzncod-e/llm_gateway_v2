@@ -58,7 +58,11 @@ func (f *fakeAdapter) next(model string) step {
 	return ss[i]
 }
 
-func (f *fakeAdapter) count(model string) int { f.mu.Lock(); defer f.mu.Unlock(); return f.calls[model] }
+func (f *fakeAdapter) count(model string) int {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return f.calls[model]
+}
 
 func (f *fakeAdapter) Type() string { return f.typ }
 
@@ -125,10 +129,10 @@ func (m *memRecorder) Record(_ context.Context, r *usage.RequestRecord) error {
 }
 
 type fakeBudget struct {
-	has       bool
-	exceed    bool
-	reserved  []int64
-	released  int
+	has      bool
+	exceed   bool
+	reserved []int64
+	released int
 }
 
 func (b *fakeBudget) Reserve(_ context.Context, team, req uuid.UUID, amount int64) (*budget.Reservation, bool, error) {
@@ -164,10 +168,10 @@ type sink struct {
 	onSend  func(n int)
 }
 
-func (s *sink) WriteError(m Meta, e *APIError)                     { s.meta, s.errResp = m, e }
-func (s *sink) WriteResponse(m Meta, r *ChatCompletionResponse)    { s.meta, s.resp = m, r }
-func (s *sink) StartStream(m Meta) StreamWriter                    { s.meta = m; return s }
-func (s *sink) Done() error                                        { s.done = true; return nil }
+func (s *sink) WriteError(m Meta, e *APIError)                  { s.meta, s.errResp = m, e }
+func (s *sink) WriteResponse(m Meta, r *ChatCompletionResponse) { s.meta, s.resp = m, r }
+func (s *sink) StartStream(m Meta) StreamWriter                 { s.meta = m; return s }
+func (s *sink) Done() error                                     { s.done = true; return nil }
 func (s *sink) Send(v any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -203,12 +207,12 @@ func (s *sink) hasErrorEvent() bool {
 // --- fixture -------------------------------------------------------------------
 
 type fixture struct {
-	e        *Engine
-	rec      *memRecorder
-	oa, an   *fakeAdapter
-	sleeps   []time.Duration
-	budget   *fakeBudget
-	limiter  *fakeLimiter
+	e       *Engine
+	rec     *memRecorder
+	oa, an  *fakeAdapter
+	sleeps  []time.Duration
+	budget  *fakeBudget
+	limiter *fakeLimiter
 }
 
 var price = pricing.Price{ID: uuid.New(), InputPerM: 1_000_000_000, OutputPerM: 2_000_000_000} // $1 / $2 per 1M
@@ -269,7 +273,9 @@ func okResp(text string) *provider.ChatResponse {
 	return &provider.ChatResponse{Content: text, FinishReason: "stop", Usage: provider.Usage{Status: provider.UsageReported, InputTokens: 1000, OutputTokens: 500}}
 }
 
-func e503() error { return &provider.Error{Kind: provider.KindServer, StatusCode: 503, Message: "unavailable", Sent: true} }
+func e503() error {
+	return &provider.Error{Kind: provider.KindServer, StatusCode: 503, Message: "unavailable", Sent: true}
+}
 
 // --- tests ---------------------------------------------------------------------
 

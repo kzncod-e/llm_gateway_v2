@@ -57,7 +57,6 @@ func reply(provider, model string) []string {
 
 func estimateTokens(chars int) int64 { return int64(math.Ceil(float64(chars) / 4)) }
 
-
 // Handler returns the mock provider HTTP handler. delay is the pause between
 // streamed chunks.
 func Handler(delay time.Duration) http.Handler {
@@ -184,7 +183,7 @@ func openAIHandler(ctl *control, delay time.Duration) http.HandlerFunc {
 		if !req.Stream {
 			writeJSON(w, 200, map[string]any{"id": id, "object": "chat.completion", "created": time.Now().Unix(), "model": req.Model,
 				"choices": []any{map[string]any{"index": 0, "message": map[string]any{"role": "assistant", "content": strings.Join(ws, " ")}, "finish_reason": "stop"}},
-				"usage": usage})
+				"usage":   usage})
 			return
 		}
 		send, ok := sse(w)

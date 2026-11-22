@@ -98,7 +98,7 @@ func (m *Metrics) AttemptFinished(prov, model, outcome string, d time.Duration) 
 	}
 }
 
-func (m *Metrics) Fallback(from, to string) { m.fallbacks.WithLabelValues(from, to).Inc() }
+func (m *Metrics) Fallback(from, to string)  { m.fallbacks.WithLabelValues(from, to).Inc() }
 func (m *Metrics) RateLimited(reason string) { m.rateLimited.WithLabelValues(reason).Inc() }
 func (m *Metrics) BudgetRejected()           { m.budgetRejections.Inc() }
 func (m *Metrics) RecordFailed()             { m.recordFailures.Inc() }

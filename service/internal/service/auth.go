@@ -39,7 +39,8 @@ var errBadCredentials = &Error{Status: http.StatusUnauthorized, Code: "invalid_c
 func (s *AuthService) Login(ctx context.Context, email, password, ua, ip string) (string, *model.User, error) {
 	email = strings.ToLower(strings.TrimSpace(email))
 	if s.limiter != nil {
-		if err := s.limiter.AllowRate(ctx, "login:"+ip, 20); err != nil {
+		// Keyed by IP and account: behind the console proxy all users share one IP.
+		if err := s.limiter.AllowRate(ctx, "login:"+ip+":"+email, 10); err != nil {
 			return "", nil, &Error{Status: http.StatusTooManyRequests, Code: "too_many_attempts", Message: "too many login attempts, try again in a minute"}
 		}
 	}

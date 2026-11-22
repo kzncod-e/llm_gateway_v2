@@ -66,3 +66,28 @@ Each record: context, decision, consequences. Status is *Accepted* unless noted.
 **Context.** Logging every rejected request during abuse would amplify load on the database.
 **Decision.** 429s from the gateway's own limiter are counted in Prometheus and access logs only. Requests that pass rate limiting (including budget rejections and upstream failures) are recorded in `gateway_requests`.
 **Consequences.** Request logs show everything that consumed or could consume budget.
+
+## ADR-014 — TanStack Table v8, not v9
+**Context.** `@tanstack/react-table` 9.x became the `latest` tag with a reworked API (`createCoreRowModel`, table features).
+**Decision.** Pin `^8`. Its API is stable and well documented; the console uses only core and sorted row models.
+**Consequences.** Upgrading to v9 later is a contained change in `components/common/data-table.tsx`.
+
+## ADR-015 — Dark-only console; standard class merging
+**Context.** The "Charcoal Sand" identity is a dark palette. The shadcn CLI also installed `next-themes` and a young `cn` package (0.5.x) duplicating `clsx` + `tailwind-merge`.
+**Decision.** Tokens live on `:root` with `color-scheme: dark`; no theme switcher. `cn()` uses `clsx` + `tailwind-merge`; `cn` and `next-themes` were removed.
+**Consequences.** Fewer dependencies; a light theme would need a second token set.
+
+## ADR-016 — Fallback on provider misconfiguration; per-account login throttle
+**Context.** A 401/403 (revoked key) or 404 (model not offered) from one provider says nothing about the next provider. Separately, behind the console's same-origin proxy every user shares one client IP.
+**Decision.** 401/403/404 are not retried on the same target but move to the next target; 400/413/422 stop the request. Login attempts are limited to 10 per minute per (IP, email).
+**Consequences.** A broken credential on the primary does not cause an outage when a fallback exists. One user's typos cannot lock out others.
+
+## ADR-017 — Default output cap is sent upstream
+**Context.** A reservation must bound the request's worst-case cost, but clients often omit `max_tokens`, leaving provider defaults that can be very large.
+**Decision.** When omitted, the engine sends `DEFAULT_MAX_OUTPUT_TOKENS` (4096) to the provider and reserves for it.
+**Consequences.** Long generations need an explicit `max_tokens`. Documented in the API reference and `.env.example`.
+
+## ADR-018 — Each attempt with unknown usage is charged its own estimate
+**Context.** A request can time out on several attempts, each of which may have consumed tokens.
+**Decision.** Every attempt with unknown usage adds its target's worst-case estimate to the budget charge. The reservation covers a single attempt, so settlement can push spend past the limit by the additional estimates.
+**Consequences.** Budgets err toward over-counting. Spend can exceed a limit by at most (attempts − 1) × estimate in this rare case; reserving for every possible attempt would reject most legitimate requests near the limit.

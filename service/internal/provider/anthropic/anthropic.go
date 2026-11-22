@@ -205,7 +205,7 @@ type stream struct {
 	sse  *provider.SSEReader
 
 	input, cacheRead, cacheWrite, output int64
-	gotStart, gotDelta, done            bool
+	gotStart, gotDelta, done             bool
 }
 
 func (s *stream) Recv() (*provider.StreamChunk, error) {

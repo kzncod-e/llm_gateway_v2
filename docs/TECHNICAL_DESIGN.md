@@ -16,7 +16,7 @@
 | Credential encryption | AES-256-GCM (stdlib) | Authenticated encryption; key from `ENCRYPTION_KEY`. |
 | IDs | UUID v7 (`google/uuid`) | Time-ordered, index-friendly, safe to expose. |
 | Tests | `testing`, `httptest`, `alicebob/miniredis` (Redis Lua in-process), real Postgres for integration tests (skipped when `TEST_DATABASE_URL` is unset) | Deterministic, no provider keys. |
-| Frontend | Next.js 16 App Router, TypeScript, Tailwind v4, shadcn/ui, TanStack Query/Table, RHF + Zod, Recharts, Lucide | As specified. Zustand is not needed: server state lives in TanStack Query, UI state in components. |
+| Frontend | Next.js 16 App Router (Cache Components), TypeScript, Tailwind v4, shadcn/ui (Radix), TanStack Query v5, TanStack Table v8, RHF + Zod 4, Recharts 3, Lucide | As specified. Zustand is not needed: server state lives in TanStack Query, UI state in components. Table v8 rather than v9: ADR-014. |
 | Traces backend | Jaeger all-in-one | Accepts OTLP natively, single container. |
 
 ## 2. Backend architecture
@@ -24,8 +24,12 @@
 ```
 service/
   cmd/api/              main: serve | migrate | seed
-  cmd/mockprovider/     mock OpenAI/Anthropic/Gemini server
+  cmd/mockprovider/     serves internal/mockllm
   internal/
+    app/                dependency wiring shared by main and end-to-end tests
+    mockllm/            mock OpenAI/Anthropic/Gemini wire formats with failure injection
+    seed/               demo data
+    testutil/           per-test Postgres schemas for integration tests
     config/             env parsing + validation
     database/           pgx pool, tracer, migration runner, migrations/*.sql
     model/              domain types (Team, APIKey, Provider, Model, Pricing, ...)
@@ -169,6 +173,8 @@ Resolution order for a requested `model` string:
 2. **Explicit provider** — `provider-slug/model-name`, or header `X-Gateway-Provider: slug` → exactly that target.
 3. **Model-based** — every enabled model with `name = model` on an enabled provider, ordered by `providers.priority` (lower first). More than one match gives automatic fallback across providers.
 
+When a client omits `max_tokens`, the engine sends `DEFAULT_MAX_OUTPUT_TOKENS` upstream so the budget reservation is a true upper bound (ADR-017).
+
 Retry defaults (overridable per policy): 2 attempts per target, backoff `min(max, base·2^(n-1))` with full jitter (base 250 ms, max 2 s), `Retry-After` honoured up to 5 s, at most 6 attempts in total, per-attempt timeout = provider `timeout_ms` (default 60 s), overall request deadline 120 s (streams: 10 min).
 
 ## 7. Circuit breaker
@@ -210,9 +216,9 @@ Full examples in `API_REFERENCE.md`. Summary:
 
 ## 10. Authentication and authorization
 
-- **Console login**: bcrypt (cost 12) password check, login throttled per IP+email. Session token = 32 random bytes, stored as SHA-256, cookie `gw_session` (`HttpOnly`, `SameSite=Lax`, `Secure` when `COOKIE_SECURE=true`), 7-day lifetime.
+- **Console login**: bcrypt (cost 12) password check, throttled to 10 attempts per minute per IP and email (ADR-016). Unknown emails take the same time as wrong passwords. Session token = 32 random bytes, stored as SHA-256, cookie `gw_session` (`HttpOnly`, `SameSite=Lax`, `Secure` when `COOKIE_SECURE=true`), 7-day lifetime.
 - **CSRF**: mutating control-plane requests must have `Content-Type: application/json`, which a cross-site form cannot send without a CORS preflight (and no CORS is enabled). Combined with `SameSite=Lax`.
-- **Roles**: `admin` can do everything. `member` sees only teams they belong to. Team `owner` manages keys, members and limits of that team; `developer` can create keys and use the playground; `viewer` is read-only. Providers, models, pricing, routing and users are admin-only.
+- **Roles**: `admin` can do everything. `member` sees only teams they belong to. Team `owner` manages keys and members and edits the team's name and description (rate limits, budgets and archival are admin-only); `developer` can create keys and use the playground; `viewer` is read-only. Providers, models, pricing, routing and users are admin-only.
 - **Team isolation**: every team-scoped repository query takes the team ID; services resolve the allowed team set from the session before querying analytics or logs.
 - **Gateway keys**: `gwk_` + 43-char base64url (256 bits). Stored: HMAC-SHA256(pepper, key) and a 12-char display prefix. Raw key returned once. Lookups cached in-process for 30 s (revocation is immediate on the instance that revoked; ≤30 s elsewhere).
 - **Bootstrap**: if no users exist, `ADMIN_EMAIL`/`ADMIN_PASSWORD` creates the first admin at startup.
@@ -235,7 +241,7 @@ web/src/
     (console)/layout.tsx           sidebar + header shell
     (console)/overview|playground|usage|providers|teams|requests|reliability|settings/...
     api/[...path]/route.ts         streaming proxy to the Go control plane
-  proxy.ts                         redirects to /login without a session cookie
+  proxy.ts                         redirects to /login without a session cookie (Next 16 "proxy" = middleware)
   components/ui/                   shadcn primitives (themed)
   components/layout/               sidebar, header, page-header
   components/common/               stat-card, data-table, states (loading/empty/error), status badges

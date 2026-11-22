@@ -1,5 +1,7 @@
 # Implementation Plan
 
+> **Status (2026-11-23):** all milestones M5–M12 implemented and verified; see `PROJECT_STATUS.md`. Deviations from this plan are recorded as ADR-014 to ADR-018 in `DECISIONS.md`.
+
 Tasks are ordered by dependency. Each task lists goal, dependencies, modules, details, tests and Definition of Done (DoD). "Tests pass" always means `go test ./...` (backend) or `pnpm test` (frontend) green.
 
 ## M5 — Infrastructure foundation

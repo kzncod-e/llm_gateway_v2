@@ -137,13 +137,15 @@ flowchart TD
   Try --> Ok{success?}
   Ok -- yes --> Done([return response])
   Ok -- no --> Kind{retryable?}
-  Kind -- no, client error 4xx --> Fail4[return error to client, no fallback]
+  Kind -- "no: 400/413/422 (request is invalid)" --> Fail4[return error to client, no fallback]
+  Kind -- "no: 401/403/404 (this provider is misconfigured)" --> Next
   Kind -- yes --> More{k < max attempts<br/>and total attempts < cap<br/>and deadline left?}
   More -- yes --> Backoff[sleep backoff with jitter<br/>honour Retry-After] --> Try
   More -- no --> Next
 ```
 
-- Non-retryable errors (400, 401, 403, 404, 422 from provider) stop immediately: switching providers will not fix a malformed request. Auth errors (401/403) do trip the breaker since they indicate a broken provider configuration, but still stop the request.
+- Invalid-request errors (400, 413, 422 from the provider) stop immediately: switching providers will not fix a malformed request.
+- Provider-specific misconfiguration (401/403 bad credential, 404 unknown model) is not retried on the same target but does move to the next target (ADR-016). 401/403 also count as breaker failures.
 - A total attempt cap (default 6) and the request deadline bound the total work and prevent retry storms.
 
 ## 6. Usage tracking lifecycle
@@ -169,7 +171,8 @@ Failed attempts that never reached the provider (connection refused, breaker ope
 | Provider timeout | Attempt cancelled at per-attempt timeout → retryable → retry/fallback. Usage `unknown` for that attempt. |
 | Provider 429 | Retryable; `Retry-After` honoured up to 5 s, otherwise fall back. Counts as breaker failure. |
 | Provider 5xx / 529 | Retryable, breaker failure. |
-| Provider 4xx (400/404/422) | Not retried, error mapped to OpenAI error shape and returned. |
+| Provider 400/413/422 | Not retried or fallen back; mapped to a 400 for the client. |
+| Provider 401/403/404 | Not retried; next target tried. |
 | All targets fail | 502 `upstream_error` (or 503 when every breaker is open). |
 | Redis unavailable | `RATE_LIMIT_FAIL_OPEN=false` (default) → 503; `true` → request proceeds without rate limiting, logged and counted. |
 | Postgres unavailable | Budget cannot be reserved → 503. Control plane returns 503. |

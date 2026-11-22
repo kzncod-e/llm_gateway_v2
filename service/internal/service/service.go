@@ -106,7 +106,9 @@ type Auditor struct {
 	log  *slog.Logger
 }
 
-func NewAuditor(repo *repository.Repo, log *slog.Logger) *Auditor { return &Auditor{repo: repo, log: log} }
+func NewAuditor(repo *repository.Repo, log *slog.Logger) *Auditor {
+	return &Auditor{repo: repo, log: log}
+}
 
 func (a *Auditor) Record(ctx context.Context, p *Principal, action, targetType, targetID string, meta map[string]any) {
 	var actor *uuid.UUID

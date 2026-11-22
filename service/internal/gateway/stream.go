@@ -99,7 +99,7 @@ func (x *exec) pipe(ctx context.Context, p *plan, s provider.Stream, first *prov
 // NopObserver discards metric events.
 type NopObserver struct{}
 
-func (NopObserver) RequestFinished(string, bool, string, time.Duration) {}
+func (NopObserver) RequestFinished(string, bool, string, time.Duration)   {}
 func (NopObserver) AttemptFinished(string, string, string, time.Duration) {}
 func (NopObserver) Fallback(string, string)                               {}
 func (NopObserver) RateLimited(string)                                    {}

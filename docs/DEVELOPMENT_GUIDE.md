@@ -5,14 +5,14 @@
 | Tool | Version used | For |
 |---|---|---|
 | Go | 1.27 | `service/` |
-| Node.js | 24+ (26 tested) | `web/` |
-| pnpm | 11 | `web/` |
+| Node.js | 24+ (26 tested) | `../llm_gateway_dashboard/` |
+| pnpm | 11 | `../llm_gateway_dashboard/` |
 | Docker + Compose v2 | any recent | Postgres, Redis, monitoring, full stack |
 | PostgreSQL | 16+ (optional) | Running integration tests without Docker |
 
 ## Running the pieces locally
 
-Start infrastructure only, then run the gateway and console from source:
+Start infrastructure only, then run the gateway from source in one terminal:
 
 ```sh
 ./scripts/gen-env.sh                       # once
@@ -24,7 +24,12 @@ export DATABASE_URL="postgres://gateway:${POSTGRES_PASSWORD}@localhost:55432/gat
 export REDIS_URL=redis://localhost:56379/0 MOCK_PROVIDER_URL=http://localhost:8090 OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4318
 go run ./cmd/api
 
-cd ../web
+```
+
+In a second terminal, run the dashboard from its sibling repository:
+
+```sh
+cd ../llm_gateway_dashboard
 pnpm install
 BACKEND_URL=http://localhost:8080 pnpm dev   # http://localhost:3000
 ```
@@ -57,7 +62,7 @@ All configuration is environment variables, documented in [`.env.example`](../.e
 | `BREAKER_FAILURE_THRESHOLD`, `BREAKER_OPEN_DURATION` | 5, 30s | Circuit breaker |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SERVICE_NAME` | empty, `llm-gateway` | Tracing (`host:port`, OTLP/HTTP); empty disables |
 
-Console: `BACKEND_URL` (where the `/api` proxy forwards; read at runtime) and `PORT`.
+Dashboard: `BACKEND_URL` (where the `/api` proxy forwards; read at runtime) and `PORT`. The dashboard source is in the sibling repository `../llm_gateway_dashboard`.
 
 ## Code map
 
@@ -85,7 +90,7 @@ Console: `BACKEND_URL` (where the `/api` proxy forwards; read at runtime) and `P
 | `internal/seed` | Demo data |
 | `internal/mockllm` | Mock OpenAI/Anthropic/Gemini wire formats with failure injection |
 
-### Frontend (`web/src/`)
+### Dashboard frontend (`../llm_gateway_dashboard/src/`)
 
 | Path | Responsibility |
 |---|---|
@@ -101,7 +106,7 @@ Console: `BACKEND_URL` (where the `/api` proxy forwards; read at runtime) and `P
 
 The console is dark-only ("Charcoal Sand"); the palette and status colors are CSS variables in `app/globals.css`.
 
-> **Next.js 16 note.** `web/AGENTS.md` points to the bundled docs in `node_modules/next/dist/docs/`. With Cache Components enabled, anything that reads the session or the current time must render inside `<Suspense>`; the console layout provides one boundary around every page.
+> **Next.js 16 note.** `../llm_gateway_dashboard/AGENTS.md` points to the bundled docs in that repository's `node_modules/next/dist/docs/`. With Cache Components enabled, anything that reads the session or the current time must render inside `<Suspense>`; the dashboard layout provides one boundary around every page.
 
 ## Tests
 
@@ -109,8 +114,8 @@ The console is dark-only ("Charcoal Sand"); the palette and status colors are CS
 |---|---|---|
 | Go unit tests | `cd service && go test -race ./...` | nothing |
 | Go integration + end-to-end | `TEST_DATABASE_URL=postgres://…/llm_gateway_test?sslmode=disable go test -race ./...` | An empty Postgres database. Each test creates and drops its own schema |
-| Frontend lint, types, unit | `cd web && pnpm lint && pnpm typecheck && pnpm test` | nothing |
-| Browser end-to-end | `cd web && pnpm build && E2E_PASSWORD=… pnpm test:e2e` | Gateway on :8080 with `SEED_DEMO=true`; Playwright starts the built console on :3100. Set `E2E_BASE_URL=http://localhost:3000` to test the Compose console instead |
+| Dashboard lint, types, unit | `cd ../llm_gateway_dashboard && pnpm lint && pnpm typecheck && pnpm test` | nothing |
+| Browser end-to-end | `cd ../llm_gateway_dashboard && pnpm build && E2E_PASSWORD=… pnpm test:e2e` | Gateway on :8080 with `SEED_DEMO=true`; Playwright starts the built dashboard on :3100. Set `E2E_BASE_URL=http://localhost:3000` to test the Compose dashboard instead |
 
 What is covered:
 

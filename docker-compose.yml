@@ -67,7 +67,8 @@ services:
       retries: 20
 
   web:
-    build: ./web
+    # The dashboard is a sibling repository: ../llm_gateway_dashboard
+    build: ../llm_gateway_dashboard
     environment:
       BACKEND_URL: http://api:8080
       PORT: "3000"

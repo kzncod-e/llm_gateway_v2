@@ -5,14 +5,14 @@ The MVP ships as two container images and standard dependencies:
 | Component | Image | Port | State |
 |---|---|---|---|
 | Gateway (`service/Dockerfile`) | distroless, non-root, contains `/api` and `/mockprovider` | 8080 | Stateless (circuit-breaker state is in memory per instance) |
-| Console (`web/Dockerfile`) | Node 24 alpine, Next.js standalone, non-root | 3000 | Stateless |
+| Dashboard (`../llm_gateway_dashboard/Dockerfile`) | Node 24 alpine, Next.js standalone, non-root | 3000 | Stateless |
 | PostgreSQL | 16+ | 5432 | Configuration, usage ledger, budgets |
 | Redis | 7+ | 6379 | Rate-limit counters (ephemeral; persistence not required) |
 | Prometheus, Grafana, OTLP collector or Jaeger | optional | | Observability |
 
 ## Single host with Docker Compose
 
-The repository's `docker-compose.yml` is a working single-host deployment.
+The repository's `docker-compose.yml` is a working single-host deployment when the sibling `../llm_gateway_dashboard` repository is checked out.
 
 ```sh
 ./scripts/gen-env.sh

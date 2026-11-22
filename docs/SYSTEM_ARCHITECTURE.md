@@ -9,7 +9,7 @@ flowchart LR
     Browser[Admin browser]
   end
 
-  subgraph Console["web (Next.js)"]
+  subgraph Console["llm_gateway_dashboard (Next.js)"]
     UI[Management console]
     BFF["/api/* proxy route"]
   end
@@ -62,7 +62,7 @@ One Go binary hosts both planes. They share the database pool and the engine, bu
 | **Usage recorder** | Writes `gateway_requests`, `provider_attempts`, `usage_records` and settles the reservation in one transaction. |
 | **Control plane HTTP** | Auth, teams, members, keys, providers, models, pricing, routing, analytics, logs, reliability, playground, audit. |
 | **Config snapshot** | Providers, models, routing policies and prices are loaded into memory and refreshed on change (and every 30 s) so the hot path does not query them. |
-| **Web console** | Next.js App Router. A server route `/api/[...path]` proxies to the control plane so cookies stay same-origin and SSE passes through. |
+| **Web console** | Next.js App Router in the separate sibling repository `../llm_gateway_dashboard`. A server route `/api/[...path]` proxies to the control plane so cookies stay same-origin and SSE passes through. |
 | **Mock provider** | Small Go server emulating OpenAI, Anthropic and Gemini wire formats with failure injection. Enables local demos and e2e tests without keys. |
 
 ## 3. Request lifecycle (non-streaming)

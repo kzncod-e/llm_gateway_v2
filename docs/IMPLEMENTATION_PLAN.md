@@ -1,6 +1,6 @@
 # Implementation Plan
 
-> **Status (2026-11-23):** all milestones M5–M12 implemented and verified; see `PROJECT_STATUS.md`. Deviations from this plan are recorded as ADR-014 to ADR-018 in `DECISIONS.md`.
+> **Status (2026-11-23):** all milestones M5–M12 implemented and verified; see `PROJECT_STATUS.md`. The dashboard source now lives in the sibling `llm_gateway_dashboard` repository. Deviations from this plan are recorded in `DECISIONS.md`.
 
 Tasks are ordered by dependency. Each task lists goal, dependencies, modules, details, tests and Definition of Done (DoD). "Tests pass" always means `go test ./...` (backend) or `pnpm test` (frontend) green.
 
@@ -8,7 +8,7 @@ Tasks are ordered by dependency. Each task lists goal, dependencies, modules, de
 
 ### T5.1 Compose stack
 - **Goal**: `docker compose up` starts postgres, redis, api, mock-llm, web, prometheus, grafana, jaeger.
-- **Deps**: none. **Files**: `docker-compose.yml`, `service/Dockerfile`, `web/Dockerfile`, `deploy/prometheus/prometheus.yml`, `deploy/grafana/**`, `.env.example`.
+- **Deps**: none. **Files**: `docker-compose.yml`, `service/Dockerfile`, `../llm_gateway_dashboard/Dockerfile`, `deploy/prometheus/prometheus.yml`, `deploy/grafana/**`, `.env.example`. The dashboard is maintained in its own sibling repository.
 - **Details**: Postgres on host port 55432 (host already uses 5432), Redis 56379, API 8080, web 3000, Grafana 3001, Prometheus 9090, Jaeger UI 16686. Health checks on postgres/redis; api waits for both.
 - **Tests**: `docker compose up -d` then `curl /readyz`, Prometheus target up.
 - **DoD**: all services healthy.

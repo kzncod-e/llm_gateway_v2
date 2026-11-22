@@ -28,6 +28,8 @@ client ──► /v1/chat/completions ──► auth ─► rate limit ─► bu
 
 Requirements: Docker with Compose v2, `openssl`.
 
+The management dashboard is in the sibling repository `../llm_gateway_dashboard`; clone both repositories side by side before starting the full Compose stack.
+
 ```sh
 ./scripts/gen-env.sh          # creates .env with random secrets and prints the console login
 docker compose up --build -d
@@ -73,7 +75,7 @@ To use real providers, add them under **Providers** in the console (credentials 
 | Path | Contents |
 |---|---|
 | `service/` | Go gateway (Gin, pgx, go-redis). Entry points in `cmd/api` and `cmd/mockprovider` |
-| `web/` | Next.js 16 management console (TypeScript, Tailwind v4, shadcn/ui, TanStack Query/Table, Recharts) |
+| `../llm_gateway_dashboard/` | Separate Next.js 16 management dashboard; Compose builds it from the sibling checkout |
 | `deploy/` | Prometheus config, Grafana provisioning and dashboard, example Nginx config |
 | `docs/` | Requirements, architecture, design, decisions, API, schema, development and deployment guides |
 | `scripts/` | `gen-env.sh` |
@@ -87,10 +89,10 @@ cd service && go test -race ./...
 TEST_DATABASE_URL="postgres://user@localhost:5432/llm_gateway_test?sslmode=disable" go test -race ./...
 
 # Frontend
-cd web && pnpm lint && pnpm typecheck && pnpm test
+cd ../llm_gateway_dashboard && pnpm lint && pnpm typecheck && pnpm test
 
 # Browser end-to-end (needs the stack running)
-cd web && pnpm build && E2E_PASSWORD=<admin password> pnpm test:e2e
+cd ../llm_gateway_dashboard && pnpm build && E2E_PASSWORD=<admin password> pnpm test:e2e
 ```
 
 None of the tests need real provider keys. See [docs/DEVELOPMENT_GUIDE.md](docs/DEVELOPMENT_GUIDE.md) for details.

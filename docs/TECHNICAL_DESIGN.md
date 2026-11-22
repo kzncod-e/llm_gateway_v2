@@ -235,7 +235,7 @@ Full examples in `API_REFERENCE.md`. Summary:
 ## 12. Frontend architecture
 
 ```
-web/src/
+../llm_gateway_dashboard/src/
   app/
     (auth)/login/page.tsx
     (console)/layout.tsx           sidebar + header shell

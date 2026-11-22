@@ -9,11 +9,11 @@ Last updated: 2026-11-23. **MVP complete**: all milestones done and all 22 accep
 | M2 System architecture | Done | `docs/SYSTEM_ARCHITECTURE.md` |
 | M3 Technical design | Done | `docs/TECHNICAL_DESIGN.md` |
 | M4 Implementation plan | Done | `docs/IMPLEMENTATION_PLAN.md`, `docs/DECISIONS.md` (ADR-001…018) |
-| M5 Infrastructure | Done | Compose: postgres, redis, mock-llm, api, web, prometheus, grafana, jaeger. Cold start from empty volumes verified. |
+| M5 Infrastructure | Done | Compose: postgres, redis, mock-llm, api, sibling dashboard repo, prometheus, grafana, jaeger. Cold start from empty volumes verified. |
 | M6 Backend core | Done | Config, migrations, logging, health, auth/sessions, RBAC, teams, API keys, provider registry. |
 | M7 Gateway engine | Done | OpenAI, Anthropic, Gemini adapters; routing; retry/backoff; fallback; circuit breaker; JSON + SSE. |
 | M8 Usage & cost | Done | Versioned pricing, nano-USD costs, usage ledger, Postgres budget reservations, Redis rate limits. |
-| M9 Frontend | Done | All eight sections against real APIs; Charcoal Sand design system. |
+| M9 Frontend | Done | Dashboard maintained in separate `llm_gateway_dashboard` repo; all eight sections use real APIs and the Charcoal Sand design system. |
 | M10 Observability | Done | Prometheus metrics, provisioned Grafana dashboard, OTel traces (HTTP, attempts, DB, Redis) verified with live traffic. |
 | M11 Testing & hardening | Done | Unit, integration, API end-to-end, browser end-to-end, and live failure injection. |
 | M12 Documentation | Done | README, API reference, schema, development and deployment guides. |

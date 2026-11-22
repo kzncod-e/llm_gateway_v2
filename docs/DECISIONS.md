@@ -4,8 +4,8 @@ Each record: context, decision, consequences. Status is *Accepted* unless noted.
 
 ## ADR-001 — Monorepo with one Go binary for both planes
 **Context.** The spec separates data plane and control plane but warns against unnecessary microservices.
-**Decision.** `service/` builds one binary with two route groups (`/v1` data plane, `/api/v1` control plane) sharing the DB pool and gateway engine. `web/` holds the Next.js console. Compose, docs and monitoring config live at the root.
-**Consequences.** One deployable and one config surface. The planes are still separate packages, so splitting later is a new `main` package, not a rewrite.
+**Decision.** `service/` builds one binary with two route groups (`/v1` data plane, `/api/v1` control plane) sharing the DB pool and gateway engine. The Next.js dashboard source lives in the separate sibling repository `../llm_gateway_dashboard`; Compose, docs and monitoring config live here.
+**Consequences.** The data and control planes share one backend binary; the dashboard has an independent source repository and build, and connects through the control-plane API.
 
 ## ADR-002 — Keep existing module name and layered folders
 **Context.** The workspace already had module `service` with empty `internal/{handler,service,repository,model,router,database,dtp}`.

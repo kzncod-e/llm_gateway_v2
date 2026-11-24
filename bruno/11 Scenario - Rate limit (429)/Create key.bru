@@ -1,0 +1,32 @@
+meta {
+  name: Create key
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/teams/{{rpmTeamId}}/api-keys
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "bruno rpm"
+  }
+}
+
+script:post-response {
+  bru.setVar("rpmKey", res.getBody().key);
+}
+
+tests {
+  test("status 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

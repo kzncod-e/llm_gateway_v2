@@ -1,0 +1,21 @@
+meta {
+  name: Me without session (401)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrlNoCookie}}/api/v1/auth/me
+  body: none
+  auth: none
+}
+
+tests {
+  test("status 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}
+
+docs {
+  Uses `baseUrlNoCookie` (127.0.0.1 instead of localhost) so Bruno's cookie jar does not attach the session cookie stored by Login.
+}

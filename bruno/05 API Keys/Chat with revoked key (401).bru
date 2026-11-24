@@ -1,0 +1,38 @@
+meta {
+  name: Chat with revoked key (401)
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{newKey}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "fast",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256
+  }
+}
+
+tests {
+  test("status 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

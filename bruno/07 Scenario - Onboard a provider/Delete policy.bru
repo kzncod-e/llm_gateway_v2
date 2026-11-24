@@ -1,0 +1,21 @@
+meta {
+  name: Delete policy
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/routing-policies/{{policyId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 204", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

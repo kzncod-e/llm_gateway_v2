@@ -1,0 +1,54 @@
+docs {
+  # LLM Gateway
+
+  Covers every endpoint of the gateway: health, data plane (`/v1`), and control plane (`/api/v1`),
+  plus scenarios for fallback, provider onboarding, rate limiting, budgets and circuit breaking.
+
+  1. Start the stack: `docker compose up -d` in the repo root.
+  2. Copy `bruno/.env.example` to `bruno/.env` and fill in the values from the repo `.env`.
+  3. Select the **Local** environment.
+  4. Run the whole collection (Runner), or any single request.
+
+  The collection script below runs before every request. It sets `ts` (unique suffix for test data),
+  `dateFrom`/`dateTo` (last `rangeDays` days) and, for control-plane requests, logs in automatically
+  when `sessionToken` is empty.
+
+  Runs create teams, a user, a provider and a policy with a `bruno-<timestamp>` suffix; folder 99 archives or deletes them.
+}
+
+script:pre-request {
+  // Unique suffix for names and slugs created by this run.
+  if (!bru.getVar("ts")) bru.setVar("ts", String(Date.now()));
+
+  // Analytics and log range: the last `rangeDays` days up to now (RFC 3339, so today is included).
+  const days = Number(bru.getEnvVar("rangeDays")) || 7;
+  const now = new Date();
+  bru.setVar("dateTo", now.toISOString());
+  bru.setVar("dateFrom", new Date(now.getTime() - days * 86400000).toISOString());
+
+  // Control-plane requests need a console session; log in once if there is none yet.
+  const url = req.getUrl();
+  const needsSession = url.includes("/api/v1/") && !url.includes("/auth/login") && !url.includes("{{baseUrlNoCookie}}");
+  if (needsSession && !bru.getVar("sessionToken")) {
+    const base = (bru.getEnvVar("baseUrl") || "http://localhost:8080").replace(/\/+$/, "");
+    const options = {
+      method: "POST",
+      url: base + "/api/v1/auth/login",
+      headers: { "Content-Type": "application/json" },
+      data: { email: bru.getProcessEnv("ADMIN_EMAIL"), password: bru.getProcessEnv("ADMIN_PASSWORD") },
+      validateStatus: () => true,
+    };
+    const res = typeof bru.sendRequest === "function"
+      ? await new Promise((resolve, reject) => bru.sendRequest(options, (err, r) => (err ? reject(err) : resolve(r))))
+      : await require("axios")(options);
+    const raw = res.headers["set-cookie"];
+    const cookies = Array.isArray(raw) ? raw : [raw || ""];
+    for (const cookie of cookies) {
+      const m = /gw_session=([^;]+)/.exec(cookie);
+      if (m) bru.setVar("sessionToken", m[1]);
+    }
+    if (!bru.getVar("sessionToken")) {
+      throw new Error("Auto-login failed (HTTP " + res.status + "). Check ADMIN_EMAIL / ADMIN_PASSWORD in bruno/.env.");
+    }
+  }
+}

@@ -1,0 +1,53 @@
+meta {
+  name: Chat - system prompt and params
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{apiKey}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "smart",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You answer in one sentence."
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "What is an LLM gateway?"
+          }
+        ]
+      }
+    ],
+    "temperature": 0.3,
+    "top_p": 0.9,
+    "max_completion_tokens": 128,
+    "stop": [
+      "\n\n"
+    ],
+    "user": "bruno"
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

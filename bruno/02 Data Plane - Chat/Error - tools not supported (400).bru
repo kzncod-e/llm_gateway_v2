@@ -1,0 +1,47 @@
+meta {
+  name: Error - tools not supported (400)
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{apiKey}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "smart",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "x",
+          "parameters": {}
+        }
+      }
+    ]
+  }
+}
+
+tests {
+  test("status 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

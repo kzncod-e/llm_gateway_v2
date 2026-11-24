@@ -1,0 +1,30 @@
+meta {
+  name: List providers
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/providers
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+script:post-response {
+  const openai = res.getBody().data.find((p) => p.slug === "openai-mock");
+  if (openai) bru.setVar("openaiProviderId", openai.id);
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+docs {
+  Shows `circuit_state`, `has_api_key` and `api_key_last4`. Credentials are never returned.
+}

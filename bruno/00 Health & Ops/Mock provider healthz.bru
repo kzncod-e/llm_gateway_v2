@@ -1,0 +1,17 @@
+meta {
+  name: Mock provider healthz
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{mockUrl}}/healthz
+  body: none
+  auth: none
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

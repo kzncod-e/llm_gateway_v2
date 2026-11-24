@@ -1,0 +1,30 @@
+meta {
+  name: Logout
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/logout
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {}
+}
+
+script:post-response {
+  bru.setVar("sessionToken", "");
+}
+
+tests {
+  test("status 204", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

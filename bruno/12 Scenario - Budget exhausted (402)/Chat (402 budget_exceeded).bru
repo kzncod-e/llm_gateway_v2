@@ -1,0 +1,42 @@
+meta {
+  name: Chat (402 budget_exceeded)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{budgetKey}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "smart",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256
+  }
+}
+
+tests {
+  test("status 402", function () {
+    expect(res.getStatus()).to.equal(402);
+  });
+
+  test("error code budget_exceeded", function () {
+    expect(res.getBody().error.code).to.equal("budget_exceeded");
+  });
+}

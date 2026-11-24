@@ -1,0 +1,26 @@
+meta {
+  name: List models
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/v1/models
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{apiKey}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("lists seeded aliases", function () {
+    const ids = res.getBody().data.map((m) => m.id);
+    expect(ids).to.include.members(["smart", "fast", "fallback-demo"]);
+  });
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Remove member
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}/members/{{userId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 204", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

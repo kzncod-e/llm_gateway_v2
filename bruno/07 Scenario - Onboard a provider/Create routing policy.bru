@@ -1,0 +1,40 @@
+meta {
+  name: Create routing policy
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/v1/routing-policies
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "alias": "bruno-{{ts}}",
+    "description": "Bruno test policy",
+    "target_model_ids": [
+      "{{modelId}}"
+    ],
+    "max_attempts_per_target": 2,
+    "retry_base_ms": 100,
+    "retry_max_ms": 1000,
+    "enabled": true
+  }
+}
+
+script:post-response {
+  bru.setVar("policyId", res.getBody().id);
+}
+
+tests {
+  test("status 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Archive Bruno team
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "archived": true
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

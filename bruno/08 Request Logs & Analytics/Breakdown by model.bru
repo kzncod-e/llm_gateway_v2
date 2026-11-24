@@ -1,0 +1,27 @@
+meta {
+  name: Breakdown by model
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/v1/analytics/breakdown?from={{dateFrom}}&to={{dateTo}}&by=model
+  body: none
+  auth: none
+}
+
+params:query {
+  from: {{dateFrom}}
+  to: {{dateTo}}
+  by: model
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

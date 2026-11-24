@@ -1,0 +1,26 @@
+meta {
+  name: Audit logs
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/audit-logs?limit=50&offset=0
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,43 @@
+meta {
+  name: Login
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "{{adminEmail}}",
+    "password": "{{adminPassword}}"
+  }
+}
+
+script:post-response {
+  const raw = res.getHeader("set-cookie");
+  const cookies = Array.isArray(raw) ? raw : [raw || ""];
+  for (const cookie of cookies) {
+    const m = /gw_session=([^;]+)/.exec(cookie);
+    if (m) bru.setVar("sessionToken", m[1]);
+  }
+  bru.setVar("adminUserId", res.getBody()?.user?.id);
+  bru.setVar("ts", String(Date.now()));
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("session cookie captured", function () {
+    expect(bru.getVar("sessionToken")).to.be.a("string").and.not.empty;
+  });
+}

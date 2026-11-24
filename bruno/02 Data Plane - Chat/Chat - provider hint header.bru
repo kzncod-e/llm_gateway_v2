@@ -1,0 +1,43 @@
+meta {
+  name: Chat - provider hint header
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{apiKey}}
+}
+
+headers {
+  X-Gateway-Provider: openai-mock
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "gpt-4o-mini",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("hint honoured", function () {
+    expect(res.getHeader("x-gateway-provider")).to.equal("openai-mock");
+  });
+}

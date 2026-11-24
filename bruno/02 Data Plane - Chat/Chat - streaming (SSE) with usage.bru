@@ -1,0 +1,49 @@
+meta {
+  name: Chat - streaming (SSE) with usage
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{apiKey}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "smart",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256,
+    "stream": true,
+    "stream_options": {
+      "include_usage": true
+    }
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("SSE ends with [DONE] and carries usage", function () {
+    const body = typeof res.getBody() === "string" ? res.getBody() : JSON.stringify(res.getBody());
+    expect(body).to.include("chat.completion.chunk");
+    expect(body).to.include("\"usage\"");
+    expect(body).to.include("data: [DONE]");
+  });
+}

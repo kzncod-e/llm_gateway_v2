@@ -1,0 +1,21 @@
+meta {
+  name: List members
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}/members
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

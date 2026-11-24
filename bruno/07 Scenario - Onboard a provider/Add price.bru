@@ -1,0 +1,33 @@
+meta {
+  name: Add price
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/models/{{modelId}}/prices
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "input_per_mtok_nanos": 150000000,
+    "output_per_mtok_nanos": 600000000
+  }
+}
+
+tests {
+  test("status 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}
+
+docs {
+  Per million tokens, in nano-USD: $0.15 input, $0.60 output. Without a price a budgeted team gets 503 `pricing_not_configured`.
+}

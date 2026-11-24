@@ -1,0 +1,27 @@
+meta {
+  name: Restore OpenAI (ok)
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{mockUrl}}/control
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "openai": "ok"
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

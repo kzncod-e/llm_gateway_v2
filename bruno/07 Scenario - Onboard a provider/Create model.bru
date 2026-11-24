@@ -1,0 +1,35 @@
+meta {
+  name: Create model
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/models
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "provider_id": "{{providerId}}",
+    "name": "gpt-4o-mini",
+    "display_name": "Bruno GPT-4o mini",
+    "enabled": true
+  }
+}
+
+script:post-response {
+  bru.setVar("modelId", res.getBody().id);
+}
+
+tests {
+  test("status 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

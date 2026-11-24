@@ -1,0 +1,29 @@
+meta {
+  name: Filter - Demo Team, API source
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/requests?from={{dateFrom}}&to={{dateTo}}&team_id={{demoTeamId}}&source=api&limit=20
+  body: none
+  auth: none
+}
+
+params:query {
+  from: {{dateFrom}}
+  to: {{dateTo}}
+  team_id: {{demoTeamId}}
+  source: api
+  limit: 20
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,34 @@
+meta {
+  name: Replace policy (PUT)
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseUrl}}/api/v1/routing-policies/{{policyId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "alias": "bruno-{{ts}}",
+    "description": "Now with gpt-4o fallback",
+    "target_model_ids": [
+      "{{modelId}}",
+      "{{gpt4oModelId}}"
+    ],
+    "enabled": true
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

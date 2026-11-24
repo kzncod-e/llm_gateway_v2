@@ -1,0 +1,29 @@
+meta {
+  name: Add member
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}/members
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "{{userEmail}}",
+    "role": "developer"
+  }
+}
+
+tests {
+  test("2xx", function () {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}

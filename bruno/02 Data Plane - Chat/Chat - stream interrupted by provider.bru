@@ -1,0 +1,49 @@
+meta {
+  name: Chat - stream interrupted by provider
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{apiKey}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "openai-mock/mock-drop-stream",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256,
+    "stream": true
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("ends with stream_interrupted and no [DONE]", function () {
+    const body = typeof res.getBody() === "string" ? res.getBody() : JSON.stringify(res.getBody());
+    expect(body).to.include("stream_interrupted");
+    expect(body).to.not.include("[DONE]");
+  });
+}
+
+docs {
+  The mock model drops the stream mid-way. The gateway records the request and ends the SSE with an error event.
+}

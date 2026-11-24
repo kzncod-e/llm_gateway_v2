@@ -1,0 +1,25 @@
+meta {
+  name: Prometheus metrics
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/metrics
+  body: none
+  auth: none
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("exposes gateway metrics", function () {
+    expect(String(res.getBody())).to.include("llm_gateway_requests_total");
+  });
+}
+
+docs {
+  Useful series: `llm_gateway_requests_total`, `llm_gateway_fallback_total`, `llm_gateway_circuit_breaker_state` (0 closed, 1 half-open, 2 open), `llm_gateway_budget_rejections_total`, `llm_gateway_tokens_total`.
+}

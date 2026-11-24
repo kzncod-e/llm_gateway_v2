@@ -1,0 +1,28 @@
+meta {
+  name: Update model
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/models/{{modelId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "display_name": "Bruno GPT-4o mini (edited)"
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

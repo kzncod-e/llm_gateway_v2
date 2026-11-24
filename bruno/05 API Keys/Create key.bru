@@ -1,0 +1,38 @@
+meta {
+  name: Create key
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}/api-keys
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "bruno key",
+    "expires_in_days": 1
+  }
+}
+
+script:post-response {
+  bru.setVar("newKey", res.getBody().key);
+  bru.setVar("newKeyId", res.getBody().id);
+}
+
+tests {
+  test("status 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("raw key returned once", function () {
+    expect(res.getBody().key).to.match(/^gwk_/);
+  });
+}

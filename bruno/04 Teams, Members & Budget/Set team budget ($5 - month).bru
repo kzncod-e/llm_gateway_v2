@@ -1,0 +1,30 @@
+meta {
+  name: Set team budget ($5 / month)
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}/budget
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "monthly_limit_nanos": 5000000000,
+    "daily_limit_nanos": null,
+    "warn_threshold_pct": 80
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,59 @@
+meta {
+  name: Chat - fallback-demo
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{apiKey}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "fallback-demo",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("routing headers present", function () {
+    expect(res.getHeader("x-request-id")).to.be.a("string");
+    expect(res.getHeader("x-gateway-provider")).to.be.a("string");
+    expect(res.getHeader("x-gateway-attempts")).to.be.a("string");
+  });
+  test("has answer and usage with cost", function () {
+    const b = res.getBody();
+    expect(b.choices[0].message.content).to.be.a("string").and.not.empty;
+    expect(b.usage.total_tokens).to.be.above(0);
+    expect(b.usage.cost_nanos).to.be.a("number");
+  });
+
+  test("fell back to anthropic-mock", function () {
+    expect(res.getHeader("x-gateway-provider")).to.equal("anthropic-mock");
+    expect(Number(res.getHeader("x-gateway-attempts"))).to.be.above(1);
+  });
+}
+
+docs {
+  The primary target returns 503, so the gateway retries and then falls back. Open the request in the console Logs to see each attempt.
+}

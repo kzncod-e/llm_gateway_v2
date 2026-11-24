@@ -1,0 +1,21 @@
+meta {
+  name: Delete provider
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/providers/{{providerId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 204", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

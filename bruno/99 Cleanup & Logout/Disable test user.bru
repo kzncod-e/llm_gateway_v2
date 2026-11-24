@@ -1,0 +1,28 @@
+meta {
+  name: Disable test user
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/users/{{userId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "disabled": true
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,26 @@
+meta {
+  name: List models (with current price)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/models
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+script:post-response {
+  const m = res.getBody().data.find((x) => x.name === "gpt-4o");
+  if (m) bru.setVar("gpt4oModelId", m.id);
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

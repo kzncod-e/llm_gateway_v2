@@ -1,0 +1,30 @@
+meta {
+  name: Analytics summary (7 days)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/analytics/summary?from={{dateFrom}}&to={{dateTo}}
+  body: none
+  auth: none
+}
+
+params:query {
+  from: {{dateFrom}}
+  to: {{dateTo}}
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+docs {
+  `from`/`to` come from `dateFrom`/`dateTo`, which the collection script sets to the last `rangeDays` days (environment, default 7) before every request. Add `team_id: {{demoTeamId}}` to scope it to one team.
+}

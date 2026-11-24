@@ -1,0 +1,28 @@
+meta {
+  name: Update my name
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/auth/me
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Admin"
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

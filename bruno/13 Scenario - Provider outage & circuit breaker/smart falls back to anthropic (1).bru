@@ -1,0 +1,42 @@
+meta {
+  name: smart falls back to anthropic (1)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{apiKey}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "smart",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("served by anthropic-mock", function () {
+    expect(res.getHeader("x-gateway-provider")).to.equal("anthropic-mock");
+  });
+}

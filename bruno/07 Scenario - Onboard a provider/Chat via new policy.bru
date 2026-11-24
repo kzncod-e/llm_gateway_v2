@@ -1,0 +1,42 @@
+meta {
+  name: Chat via new policy
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{apiKey}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "bruno-{{ts}}",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("served by the new provider", function () {
+    expect(res.getHeader("x-gateway-provider")).to.equal("bruno-" + bru.getVar("ts"));
+  });
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Models of one provider
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/models?provider_id={{openaiProviderId}}
+  body: none
+  auth: none
+}
+
+params:query {
+  provider_id: {{openaiProviderId}}
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

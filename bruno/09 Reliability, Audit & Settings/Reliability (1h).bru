@@ -1,0 +1,25 @@
+meta {
+  name: Reliability (1h)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/reliability?window=1h
+  body: none
+  auth: none
+}
+
+params:query {
+  window: 1h
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

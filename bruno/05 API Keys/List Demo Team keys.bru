@@ -1,0 +1,21 @@
+meta {
+  name: List Demo Team keys
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/teams/{{demoTeamId}}/api-keys
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

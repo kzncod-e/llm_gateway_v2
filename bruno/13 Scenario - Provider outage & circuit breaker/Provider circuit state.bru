@@ -1,0 +1,25 @@
+meta {
+  name: Provider circuit state
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/providers/{{openaiProviderId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+docs {
+  `circuit.state` becomes `open` once the threshold is reached; `consecutive_failures` shows progress.
+}

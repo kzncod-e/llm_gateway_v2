@@ -1,0 +1,31 @@
+meta {
+  name: Analytics timeseries (hourly)
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/analytics/timeseries?from={{dateFrom}}&to={{dateTo}}&interval=hour
+  body: none
+  auth: none
+}
+
+params:query {
+  from: {{dateFrom}}
+  to: {{dateTo}}
+  interval: hour
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+docs {
+  `from`/`to` come from `dateFrom`/`dateTo`, which the collection script sets to the last `rangeDays` days (environment, default 7) before every request. Hourly ranges are limited to 31 days.
+}

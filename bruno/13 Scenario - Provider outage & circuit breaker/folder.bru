@@ -1,0 +1,11 @@
+meta {
+  name: 13 Scenario - Provider outage & circuit breaker
+  seq: 14
+}
+
+docs {
+  Uses the mock provider's `/control` endpoint to make every OpenAI-format call fail with 503.
+  `smart` then falls back to Anthropic. After 5 consecutive failures (`BREAKER_FAILURE_THRESHOLD`) the openai-mock
+  circuit opens for 30 s; the last steps restore the mock and force the breaker closed.
+  Modes: `ok`, `503`, `429`, `500`, `slow`, `drop` for `openai`, `anthropic`, `gemini`.
+}

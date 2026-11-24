@@ -1,0 +1,30 @@
+meta {
+  name: List teams
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/teams
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+script:post-response {
+  const demo = res.getBody().data.find((t) => t.slug === "demo");
+  if (demo) bru.setVar("demoTeamId", demo.id);
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("demo team found", function () {
+    expect(bru.getVar("demoTeamId")).to.be.a("string");
+  });
+}

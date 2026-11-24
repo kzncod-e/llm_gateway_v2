@@ -1,0 +1,29 @@
+meta {
+  name: Demo Team budget
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/teams/{{demoTeamId}}/budget
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("budget fields", function () {
+    expect(res.getBody()).to.have.property("month_remaining_nanos");
+  });
+}
+
+docs {
+  All money is integer nano-USD: 1 USD = 1,000,000,000.
+}

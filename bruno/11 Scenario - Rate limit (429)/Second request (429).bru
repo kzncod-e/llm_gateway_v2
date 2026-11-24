@@ -1,0 +1,46 @@
+meta {
+  name: Second request (429)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/v1/chat/completions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{rpmKey}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "fast",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256
+  }
+}
+
+tests {
+  test("status 429", function () {
+    expect(res.getStatus()).to.equal(429);
+  });
+
+  test("error code rate_limit_exceeded", function () {
+    expect(res.getBody().error.code).to.equal("rate_limit_exceeded");
+  });
+
+  test("Retry-After set", function () {
+    expect(res.getHeader("retry-after")).to.be.a("string");
+  });
+}

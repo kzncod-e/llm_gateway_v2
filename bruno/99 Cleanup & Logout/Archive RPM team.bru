@@ -1,0 +1,28 @@
+meta {
+  name: Archive RPM team
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/teams/{{rpmTeamId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "archived": true
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

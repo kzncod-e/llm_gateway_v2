@@ -1,0 +1,21 @@
+meta {
+  name: Delete model
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/models/{{modelId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 204", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

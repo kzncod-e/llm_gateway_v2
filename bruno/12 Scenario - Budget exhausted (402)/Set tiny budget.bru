@@ -1,0 +1,29 @@
+meta {
+  name: Set tiny budget
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/api/v1/teams/{{budgetTeamId}}/budget
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "monthly_limit_nanos": 1,
+    "daily_limit_nanos": null
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

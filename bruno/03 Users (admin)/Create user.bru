@@ -1,0 +1,36 @@
+meta {
+  name: Create user
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/users
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "bruno-{{ts}}@example.com",
+    "name": "Bruno Tester",
+    "password": "bruno-password-123",
+    "role": "member"
+  }
+}
+
+script:post-response {
+  bru.setVar("userId", res.getBody().id);
+  bru.setVar("userEmail", res.getBody().email);
+}
+
+tests {
+  test("status 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

@@ -1,0 +1,39 @@
+meta {
+  name: Playground chat (Demo Team)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/playground/chat?team_id={{demoTeamId}}
+  body: json
+  auth: none
+}
+
+params:query {
+  team_id: {{demoTeamId}}
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "model": "smart",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain circuit breakers simply"
+      }
+    ],
+    "max_tokens": 256
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,36 @@
+meta {
+  name: List requests
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/requests?from={{dateFrom}}&to={{dateTo}}&limit=20
+  body: none
+  auth: none
+}
+
+params:query {
+  from: {{dateFrom}}
+  to: {{dateTo}}
+  limit: 20
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+script:post-response {
+  const first = res.getBody().data[0];
+  if (first) bru.setVar("requestId", first.id);
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+docs {
+  `from`/`to` come from `dateFrom`/`dateTo`, which the collection script sets to the last `rangeDays` days (environment, default 7) before every request. Stores the newest request's ID in `requestId`.
+}

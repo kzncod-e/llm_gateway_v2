@@ -1,0 +1,27 @@
+meta {
+  name: Breakdown by provider
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/v1/analytics/breakdown?from={{dateFrom}}&to={{dateTo}}&by=provider
+  body: none
+  auth: none
+}
+
+params:query {
+  from: {{dateFrom}}
+  to: {{dateTo}}
+  by: provider
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

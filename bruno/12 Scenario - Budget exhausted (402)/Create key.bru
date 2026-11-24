@@ -1,0 +1,32 @@
+meta {
+  name: Create key
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/teams/{{budgetTeamId}}/api-keys
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "bruno budget"
+  }
+}
+
+script:post-response {
+  bru.setVar("budgetKey", res.getBody().key);
+}
+
+tests {
+  test("status 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

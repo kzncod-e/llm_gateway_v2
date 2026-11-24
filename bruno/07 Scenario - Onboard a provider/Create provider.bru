@@ -1,0 +1,44 @@
+meta {
+  name: Create provider
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/providers
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Bruno OpenAI {{ts}}",
+    "slug": "bruno-{{ts}}",
+    "type": "openai",
+    "base_url": "{{mockInternalUrl}}/openai",
+    "api_key": "sk-bruno-test",
+    "enabled": true,
+    "priority": 50,
+    "timeout_ms": 15000
+  }
+}
+
+script:post-response {
+  bru.setVar("providerId", res.getBody().id);
+}
+
+tests {
+  test("status 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("credential stored but not returned", function () {
+    expect(res.getBody().has_api_key).to.equal(true);
+    expect(JSON.stringify(res.getBody())).to.not.include("sk-bruno-test");
+  });
+}

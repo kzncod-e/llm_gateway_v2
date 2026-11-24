@@ -1,0 +1,21 @@
+meta {
+  name: Revoke key
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}/api-keys/{{newKeyId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 204", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

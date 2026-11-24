@@ -1,0 +1,25 @@
+meta {
+  name: Request detail (attempts)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/requests/{{requestId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+docs {
+  Includes `attempts[]` with per-attempt provider, status, usage and cost. Run **List requests** first to set `requestId`.
+}

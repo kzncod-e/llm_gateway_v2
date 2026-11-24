@@ -1,0 +1,9 @@
+meta {
+  name: 01 Auth (console session)
+  seq: 2
+}
+
+docs {
+  Logs in as the admin from `.env` and stores the `gw_session` cookie in the runtime variable `sessionToken`.
+  Every control-plane request sends `Cookie: gw_session={{sessionToken}}`, so run **Login** first.
+}

@@ -1,0 +1,30 @@
+meta {
+  name: Update team limits
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: gw_session={{sessionToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "description": "Updated by Bruno",
+    "rpm_limit": 600,
+    "concurrency_limit": 20
+  }
+}
+
+tests {
+  test("status 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
